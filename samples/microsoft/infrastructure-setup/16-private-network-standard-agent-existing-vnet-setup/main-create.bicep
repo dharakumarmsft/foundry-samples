@@ -208,6 +208,7 @@ module privateEndpointAndDNS 'modules-network-secured/private-endpoint-and-dns.b
       vnetName: vnet.outputs.virtualNetworkName    // VNet containing subnets
       peSubnetName: vnet.outputs.peSubnetName        // Subnet for private endpoints
       suffix: uniqueSuffix                                    // Unique identifier
+      vnetResourceGroupName: vnet.outputs.virtualNetworkResourceGroup
     }
   }
 
