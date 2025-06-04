@@ -52,10 +52,10 @@ param displayName string = 'project'
 @description('Virtual Network name for the Agent to create new')
 param vnetName string = ''
 
-@description('The name of Agents Subnet')
+@description('The name of Agents Subnet or existing subnet for agents')
 param agentSubnetName string = 'agent-subnet'
 
-@description('The name of Private Endpoint subnet')
+@description('The name of Private Endpoint subnet or existing subnet for private endpoints')
 param peSubnetName string = 'pe-subnet'
 //Existing standard Agent required resources
 @description('Existing Virtual Network name Resource ID')

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.35.1.17967",
-      "templateHash": "5854439791922998809"
+      "templateHash": "7894821250026070615"
     }
   },
   "parameters": {
@@ -115,14 +115,14 @@
       "type": "string",
       "defaultValue": "agent-subnet",
       "metadata": {
-        "description": "The name of Agents Subnet"
+        "description": "The name of Agents Subnet or existing subnet for agents"
       }
     },
     "peSubnetName": {
       "type": "string",
       "defaultValue": "pe-subnet",
       "metadata": {
-        "description": "The name of Private Endpoint subnet"
+        "description": "The name of Private Endpoint subnet or existing subnet for private endpoints"
       }
     },
     "existingVnetResourceId": {
