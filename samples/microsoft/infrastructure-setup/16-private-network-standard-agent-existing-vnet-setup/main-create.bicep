@@ -49,8 +49,8 @@ param projectDescription string = 'A project for the AI Foundry account with net
 @description('The display name of the project')
 param displayName string = 'project'
 
-@description('Virtual Network name for the Agent')
-param vnetName string = 'agents-vnet-test'
+@description('Virtual Network name for the Agent to create new')
+param vnetName string = ''
 
 @description('The name of Agents Subnet')
 param agentSubnetName string = 'agent-subnet'
@@ -96,13 +96,14 @@ var azureStorageResourceGroupName = storagePassedIn ? storageParts[4] : resource
 
 var vnetParts = split(existingVnetResourceId, '/')
 var vnetResourceGroupName = existingVnetPassedIn ? vnetParts[4] : resourceGroup().name
-
+var existingVnetName = existingVnetPassedIn ? last(vnetParts) : vnetName
+var trimVnetName = trim(existingVnetName)
 // Create Virtual Network and Subnets
 module vnet 'modules-network-secured/network-agent-vnet.bicep' = {
-  name: 'vnet-${vnetName}-${uniqueSuffix}-deployment'
+  name: 'vnet-${trimVnetName}-${uniqueSuffix}-deployment'
   params: {
     location: location
-    vnetName: vnetName
+    vnetName: trimVnetName
     useExistingVnet: existingVnetPassedIn
     existingVnetResourceGroupName: vnetResourceGroupName
     agentSubnetName: agentSubnetName
