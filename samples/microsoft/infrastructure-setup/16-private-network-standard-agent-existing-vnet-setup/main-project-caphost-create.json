@@ -1,0 +1,574 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.35.1.17967",
+      "templateHash": "388848433740400730"
+    }
+  },
+  "parameters": {
+    "projectCapHost": {
+      "type": "string",
+      "defaultValue": "caphostproj"
+    },
+    "deploymentTimestamp": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyyMMddHHmmss')]"
+    },
+    "accountName": {
+      "type": "string"
+    },
+    "projectName": {
+      "type": "string"
+    },
+    "aiSearchName": {
+      "type": "string"
+    },
+    "azureStorageName": {
+      "type": "string"
+    },
+    "cosmosDBName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "uniqueSuffix": "[substring(uniqueString(format('{0}-{1}', resourceGroup().id, parameters('deploymentTimestamp'))), 0, 4)]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('account-{0}-deployment', variables('uniqueSuffix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "accountName": {
+            "value": "[parameters('accountName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "12406844668734641491"
+            }
+          },
+          "parameters": {
+            "accountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Reference to an existing AI account. This module is used to reference an existing AI account in the Bicep template."
+              }
+            }
+          },
+          "resources": [],
+          "outputs": {
+            "accountName": {
+              "type": "string",
+              "value": "[parameters('accountName')]"
+            },
+            "accountID": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.CognitiveServices/accounts', parameters('accountName'))]"
+            },
+            "accountTarget": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('accountName')), '2025-04-01-preview').endpoint]"
+            },
+            "accountPrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('accountName')), '2025-04-01-preview', 'full').identity.principalId]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('standard-{0}-deployment', variables('uniqueSuffix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "aiSearchName": {
+            "value": "[parameters('aiSearchName')]"
+          },
+          "azureStorageName": {
+            "value": "[parameters('azureStorageName')]"
+          },
+          "cosmosDBName": {
+            "value": "[parameters('cosmosDBName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "11467492534222619155"
+            }
+          },
+          "parameters": {
+            "aiSearchName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the AI Search resource to reference"
+              }
+            },
+            "azureStorageName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the storage account to reference"
+              }
+            },
+            "cosmosDBName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the new Cosmos DB account to reference"
+              }
+            }
+          },
+          "resources": [],
+          "outputs": {
+            "aiSearchName": {
+              "type": "string",
+              "value": "[parameters('aiSearchName')]"
+            },
+            "azureStorageName": {
+              "type": "string",
+              "value": "[parameters('azureStorageName')]"
+            },
+            "cosmosDBName": {
+              "type": "string",
+              "value": "[parameters('cosmosDBName')]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('project-{0}-deployment', variables('uniqueSuffix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "accountName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('account-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.accountName.value]"
+          },
+          "projectName": {
+            "value": "[parameters('projectName')]"
+          },
+          "aiSearchName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('standard-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.aiSearchName.value]"
+          },
+          "azureStorageName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('standard-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.azureStorageName.value]"
+          },
+          "cosmosDBName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('standard-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.cosmosDBName.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "15971861541892873023"
+            }
+          },
+          "parameters": {
+            "accountName": {
+              "type": "string"
+            },
+            "projectName": {
+              "type": "string"
+            },
+            "cosmosDBName": {
+              "type": "string"
+            },
+            "azureStorageName": {
+              "type": "string"
+            },
+            "aiSearchName": {
+              "type": "string"
+            }
+          },
+          "resources": [],
+          "outputs": {
+            "projectName": {
+              "type": "string",
+              "value": "[parameters('projectName')]"
+            },
+            "projectId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.CognitiveServices/accounts/projects', parameters('accountName'), parameters('projectName'))]"
+            },
+            "projectPrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts/projects', parameters('accountName'), parameters('projectName')), '2025-04-01-preview', 'full').identity.principalId]"
+            },
+            "projectWorkspaceId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts/projects', parameters('accountName'), parameters('projectName')), '2025-04-01-preview').internalId]"
+            },
+            "cosmosDBConnection": {
+              "type": "string",
+              "value": "[parameters('cosmosDBName')]"
+            },
+            "azureStorageConnection": {
+              "type": "string",
+              "value": "[parameters('azureStorageName')]"
+            },
+            "aiSearchConnection": {
+              "type": "string",
+              "value": "[parameters('aiSearchName')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('account-{0}-deployment', variables('uniqueSuffix')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('standard-{0}-deployment', variables('uniqueSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('format-project-workspace-id-{0}-deployment', variables('uniqueSuffix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "projectWorkspaceId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.projectWorkspaceId.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "16300646131195898347"
+            }
+          },
+          "parameters": {
+            "projectWorkspaceId": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "part1": "[substring(parameters('projectWorkspaceId'), 0, 8)]",
+            "part2": "[substring(parameters('projectWorkspaceId'), 8, 4)]",
+            "part3": "[substring(parameters('projectWorkspaceId'), 12, 4)]",
+            "part4": "[substring(parameters('projectWorkspaceId'), 16, 4)]",
+            "part5": "[substring(parameters('projectWorkspaceId'), 20, 12)]",
+            "formattedGuid": "[format('{0}-{1}-{2}-{3}-{4}', variables('part1'), variables('part2'), variables('part3'), variables('part4'), variables('part5'))]"
+          },
+          "resources": [],
+          "outputs": {
+            "projectWorkspaceIdGuid": {
+              "type": "string",
+              "value": "[variables('formattedGuid')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('capabilityHost-configuration-{0}-deployment', variables('uniqueSuffix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "accountName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('account-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.accountName.value]"
+          },
+          "projectName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.projectName.value]"
+          },
+          "cosmosDBConnection": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.cosmosDBConnection.value]"
+          },
+          "azureStorageConnection": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.azureStorageConnection.value]"
+          },
+          "aiSearchConnection": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.aiSearchConnection.value]"
+          },
+          "projectCapHost": {
+            "value": "[parameters('projectCapHost')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "7334321557963469547"
+            }
+          },
+          "parameters": {
+            "cosmosDBConnection": {
+              "type": "string"
+            },
+            "azureStorageConnection": {
+              "type": "string"
+            },
+            "aiSearchConnection": {
+              "type": "string"
+            },
+            "projectName": {
+              "type": "string"
+            },
+            "accountName": {
+              "type": "string"
+            },
+            "projectCapHost": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "threadConnections": [
+              "[format('{0}', parameters('cosmosDBConnection'))]"
+            ],
+            "storageConnections": [
+              "[format('{0}', parameters('azureStorageConnection'))]"
+            ],
+            "vectorStoreConnections": [
+              "[format('{0}', parameters('aiSearchConnection'))]"
+            ]
+          },
+          "resources": [
+            {
+              "type": "Microsoft.CognitiveServices/accounts/projects/capabilityHosts",
+              "apiVersion": "2025-04-01-preview",
+              "name": "[format('{0}/{1}/{2}', parameters('accountName'), parameters('projectName'), parameters('projectCapHost'))]",
+              "properties": {
+                "capabilityHostKind": "Agents",
+                "vectorStoreConnections": "[variables('vectorStoreConnections')]",
+                "storageConnections": "[variables('storageConnections')]",
+                "threadStorageConnections": "[variables('threadConnections')]"
+              }
+            }
+          ],
+          "outputs": {
+            "projectCapHost": {
+              "type": "string",
+              "value": "[parameters('projectCapHost')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('account-{0}-deployment', variables('uniqueSuffix')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('cosmos-ra-{0}-deployment', variables('uniqueSuffix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "cosmosAccountName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('standard-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.cosmosDBName.value]"
+          },
+          "projectWorkspaceId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('format-project-workspace-id-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.projectWorkspaceIdGuid.value]"
+          },
+          "projectPrincipalId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.projectPrincipalId.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "12201918460883594239"
+            }
+          },
+          "parameters": {
+            "cosmosAccountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the AI Search resource"
+              }
+            },
+            "projectPrincipalId": {
+              "type": "string",
+              "metadata": {
+                "description": "Project name"
+              }
+            },
+            "projectWorkspaceId": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "userThreadName": "[format('{0}-thread-message-store', parameters('projectWorkspaceId'))]",
+            "systemThreadName": "[format('{0}-system-thread-message-store', parameters('projectWorkspaceId'))]",
+            "entityStoreName": "[format('{0}-agent-entity-store', parameters('projectWorkspaceId'))]",
+            "roleDefinitionId": "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions', parameters('cosmosAccountName'), '00000000-0000-0000-0000-000000000002')]",
+            "scopeSystemContainer": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/dbs/enterprise_memory/colls/{3}', subscription().subscriptionId, resourceGroup().name, parameters('cosmosAccountName'), variables('systemThreadName'))]",
+            "scopeUserContainer": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/dbs/enterprise_memory/colls/{3}', subscription().subscriptionId, resourceGroup().name, parameters('cosmosAccountName'), variables('userThreadName'))]",
+            "scopeEntityContainer": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DocumentDB/databaseAccounts/{2}/dbs/enterprise_memory/colls/{3}', subscription().subscriptionId, resourceGroup().name, parameters('cosmosAccountName'), variables('entityStoreName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments",
+              "apiVersion": "2022-05-15",
+              "name": "[format('{0}/{1}', parameters('cosmosAccountName'), guid(parameters('projectWorkspaceId'), resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosAccountName'), 'enterprise_memory', variables('userThreadName')), variables('roleDefinitionId'), parameters('projectPrincipalId')))]",
+              "properties": {
+                "principalId": "[parameters('projectPrincipalId')]",
+                "roleDefinitionId": "[variables('roleDefinitionId')]",
+                "scope": "[variables('scopeUserContainer')]"
+              }
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments",
+              "apiVersion": "2022-05-15",
+              "name": "[format('{0}/{1}', parameters('cosmosAccountName'), guid(parameters('projectWorkspaceId'), resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosAccountName'), 'enterprise_memory', variables('systemThreadName')), variables('roleDefinitionId'), parameters('projectPrincipalId')))]",
+              "properties": {
+                "principalId": "[parameters('projectPrincipalId')]",
+                "roleDefinitionId": "[variables('roleDefinitionId')]",
+                "scope": "[variables('scopeSystemContainer')]"
+              }
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments",
+              "apiVersion": "2022-05-15",
+              "name": "[format('{0}/{1}', parameters('cosmosAccountName'), guid(parameters('projectWorkspaceId'), resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosAccountName'), 'enterprise_memory', variables('entityStoreName')), variables('roleDefinitionId'), parameters('projectPrincipalId')))]",
+              "properties": {
+                "principalId": "[parameters('projectPrincipalId')]",
+                "roleDefinitionId": "[variables('roleDefinitionId')]",
+                "scope": "[variables('scopeEntityContainer')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('capabilityHost-configuration-{0}-deployment', variables('uniqueSuffix')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('format-project-workspace-id-{0}-deployment', variables('uniqueSuffix')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('standard-{0}-deployment', variables('uniqueSuffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('storage-containers-{0}-deployment', variables('uniqueSuffix'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "aiProjectPrincipalId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.projectPrincipalId.value]"
+          },
+          "storageName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('standard-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.azureStorageName.value]"
+          },
+          "workspaceId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('format-project-workspace-id-{0}-deployment', variables('uniqueSuffix'))), '2022-09-01').outputs.projectWorkspaceIdGuid.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "12300359194728762865"
+            }
+          },
+          "parameters": {
+            "storageName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the storage account"
+              }
+            },
+            "aiProjectPrincipalId": {
+              "type": "string",
+              "metadata": {
+                "description": "Principal ID of the AI Project"
+              }
+            },
+            "workspaceId": {
+              "type": "string",
+              "metadata": {
+                "description": "Workspace Id of the AI Project"
+              }
+            }
+          },
+          "variables": {
+            "conditionStr": "[format('((!(ActionMatches{{''Microsoft.Storage/storageAccounts/blobServices/containers/blobs/tags/read''}})  AND  !(ActionMatches{{''Microsoft.Storage/storageAccounts/blobServices/containers/blobs/filter/action''}}) AND  !(ActionMatches{{''Microsoft.Storage/storageAccounts/blobServices/containers/blobs/tags/write''}}) ) OR (@Resource[Microsoft.Storage/storageAccounts/blobServices/containers:name] StringStartsWithIgnoreCase ''{0}'' AND @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:name] StringLikeIgnoreCase ''*-azureml-agent''))', parameters('workspaceId'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageName'))]",
+              "name": "[guid(resourceId('Microsoft.Authorization/roleDefinitions', 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b'), resourceId('Microsoft.Storage/storageAccounts', parameters('storageName')))]",
+              "properties": {
+                "principalId": "[parameters('aiProjectPrincipalId')]",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b')]",
+                "principalType": "ServicePrincipal",
+                "conditionVersion": "2.0",
+                "condition": "[variables('conditionStr')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('capabilityHost-configuration-{0}-deployment', variables('uniqueSuffix')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('format-project-workspace-id-{0}-deployment', variables('uniqueSuffix')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('project-{0}-deployment', variables('uniqueSuffix')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('standard-{0}-deployment', variables('uniqueSuffix')))]"
+      ]
+    }
+  ]
+}
